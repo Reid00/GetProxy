@@ -1,11 +1,14 @@
 # -*- encoding: utf-8 -*-
 '''
-@File        :get_proxy.py
-@Time        :2020/07/01 11:17:53
-@Author      :Baoli
-@Version     :1.0
-@Desc        : 从快代理上爬去所有的公开的免费代理
+@File      : get_proxy.py
+@Time      : 2020/07/01 22:04:05
+@Author    : Reid 
+@Version   : 1.0
+@Contact   : isreid.zhang@outlook.com
+@Desc      : None
 '''
+
+# here put the import lib
 
 import pandas as pd
 import requests
