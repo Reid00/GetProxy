@@ -80,7 +80,7 @@ def get_proxy(url):
     })
     proxy.to_csv('proxy.csv',index=False,encoding='utf-8')
 
-@timing
+# @timing
 def verify_proxy(ip,port):
     """用ip 代理访问https://www.ipip.net/,  验证ip 是否有效
 
@@ -103,7 +103,22 @@ def verify_proxy(ip,port):
         # print('failed')
         return False
 
+@timing
+def load_ips(path):
+    """从下载的ip中读取数据，验证是否为有效代理
+    
+    :param path: 结构化的ip 的文件路径
+    """
+    data = pd.read_csv(path,sep=',',encoding='utf-8')
+    for row in data.itertuples():
+        ip,port = getattr(row,'IP'), getattr(row,'Port')
+        if verify_proxy(ip,port):
+            print(ip,port)
+        else:
+            continue
+
 
 if __name__ == "__main__":
     url = r'https://www.kuaidaili.com/free/inha/{}/'
     # get_proxy(url)
+    load_ips('proxy.csv')
