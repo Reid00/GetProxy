@@ -5,19 +5,43 @@
 @Author    : Reid 
 @Version   : 1.0
 @Contact   : isreid.zhang@outlook.com
-@Desc      : None
+@Desc      : 从网站快代理获取免费的公开代理ip
 '''
 
 # here put the import lib
 
 import pandas as pd
 import requests
+import time
+import random
+import logging
 from faker import Faker
 from lxml import etree
 
 faker = Faker()
 HEADERS= {'User-Agent':faker.user_agent()}
 
+
+def timing(func):
+    """函数运行计时器
+    
+    Usage:
+    @timing
+    def func():
+        pass
+    """
+
+    def wrapper(*args,**kwargs):
+        start = time.time()
+        print(f'Function {func.__name__} starts...')
+        result = func(*args, **kwargs)
+        end = time.time()
+        print(f'Function {func.__name__} cost time {round(end-start)} sec')
+        return result
+    return wrapper
+
+
+@timing
 def get_proxy(url):
     """从网站url 获取免费的公开代理
 
@@ -31,6 +55,7 @@ def get_proxy(url):
     for i in range(1,4000):
         url = url.format(i)
         res = requests.get(url,headers=HEADERS)
+        time.sleep(random.randint(2,4))
         html = etree.HTML(res.text)
         table = html.xpath('.//table[@class="table table-bordered table-striped"]')[0]
         rows = table.xpath('./tbody/tr')
@@ -40,12 +65,12 @@ def get_proxy(url):
             location = row.xpath('td[@data-title="位置"]/text()')[0]
             response_time = row.xpath('td[@data-title="响应速度"]/text()')[0]
             if all([ip,port]):
-                if verify_proxy(ip,port):
-                    ips.append(ip)
-                    print(ips)
-                    ports.append(port)
-                    locations.append(location if location else None)
-                    response_times.append(response_time if response_time else None)
+                # if verify_proxy(ip,port):
+                ips.append(ip)
+                # print(ips)
+                ports.append(port)
+                locations.append(location if location else None)
+                response_times.append(response_time if response_time else None)
 
     proxy = pd.DataFrame({
         'IP':ips,
@@ -55,7 +80,7 @@ def get_proxy(url):
     })
     proxy.to_csv('proxy.csv',index=False,encoding='utf-8')
 
-
+@timing
 def verify_proxy(ip,port):
     """用ip 代理访问https://www.ipip.net/,  验证ip 是否有效
 
@@ -78,6 +103,7 @@ def verify_proxy(ip,port):
         # print('failed')
         return False
 
+
 if __name__ == "__main__":
     url = r'https://www.kuaidaili.com/free/inha/{}/'
-    get_proxy(url)
+    # get_proxy(url)
